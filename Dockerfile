@@ -2,6 +2,8 @@ FROM nousresearch/hermes-agent:latest
 
 USER root
 
+RUN groupadd -g 999 docker_host && usermod -aG docker_host hermes
+
 # 1. Install Node 22 and Chrome dependencies
 RUN apt-get update && apt-get install -y curl && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
