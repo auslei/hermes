@@ -1,0 +1,19 @@
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    restart: unless-stopped
+    command: gateway run
+    ports:
+      - "8642:8642" # Gateway API
+      - "9119:9119" # <--- Change this to match the log
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./data:/opt/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - HERMES_UID=${UID:-1000}
+      - HERMES_GID=${GID:-1000}      
+      - GATEWAY_ALLOW_ALL_USERS=true
+      - HERMES_DASHBOARD=1
