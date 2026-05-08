@@ -27,3 +27,7 @@ services:
       - UV_CACHE_DIR=/opt/data/.uv-cache
       - HOME=/opt/hermes
       - XDG_CACHE_HOME=/tmp/.cache
+      # 1. Manually set the context length to match Qwen3:14b
+      - HERMES_MODEL_CONTEXT_LENGTH=40960
+      # 2. Tell the agent to ignore the 64k requirement
+      - HERMES_MODEL_MIN_CONTEXT_LENGTH=32768
