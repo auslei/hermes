@@ -1,9 +1,10 @@
 services:
   hermes:
-    image: nousresearch/hermes-agent:latest
+    build: .
+    #image: nousresearch/hermes-agent:latest
     container_name: hermes
     restart: unless-stopped
-    command: gateway run
+    command: sh -c "uv sync && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
     ports:
       - "8642:8642" # Gateway API
       - "9119:9119" # <--- Change this to match the log
@@ -11,9 +12,14 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/opt/data
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./output:/output
+      - /var/run/docker.sock:/var/run/docker.sock      
+      - /usr/bin/docker:/usr/bin/docker
     environment:
       - HERMES_UID=${UID:-1000}
       - HERMES_GID=${GID:-1000}      
       - GATEWAY_ALLOW_ALL_USERS=true
-      - HERMES_DASHBOARD=1
+      - HERMES_OUTPUT_PATH=${PWD}/output
+      - HERMES_DASHBOARD=1          
+      - npm_config_cache=/tmp/.npm      
+      - UV_CACHE_DIR=/opt/data/.uv-cache
