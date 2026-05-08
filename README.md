@@ -128,5 +128,5 @@ Generated outputs are written to `./output` on the host through the `/output` mo
 
 ## Troubleshooting
 - Always use uv run before hermes in terminal
-- Ensuter terminal is enabled: 
-`uv run hermes skills enable terminal`
+- Ensuter terminal is enabled: `uv run hermes skills enable terminal`
+- Run `sudo chmod 666 /var/run/docker.sock` if you see docker errors
