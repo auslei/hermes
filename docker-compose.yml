@@ -8,7 +8,7 @@ services:
         - GID=${GID}
     container_name: hermes
     restart: unless-stopped
-    command: sh -c "uv sync && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
+    command: sh -c "sudo chmod 666 /var/run/docker.sock && uv sync && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
     ports:
       - "8642:8642"
       - "9119:9119"

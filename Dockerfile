@@ -7,13 +7,14 @@ ARG GID
 USER root
 
 # 1. Install Docker CLI (Linux native) to allow container to execute docker commands via the socket
-RUN apt-get update && apt-get install -y ca-certificates curl gnupg && \
+RUN apt-get update && apt-get install -y ca-certificates curl gnupg sudo && \
     install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
     chmod a+r /etc/apt/keyrings/docker.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     apt-get update && apt-get install -y docker-ce-cli
+
 
 # 2. Existing User Setup Logic using dynamic variables
 RUN groupadd -g 999 docker_host && usermod -aG docker_host hermes || true
@@ -35,6 +36,9 @@ RUN npm install
 
 # 5. Give ownership of the app directory to the dynamically assigned user
 RUN chown -R ${UID}:${GID} /opt/hermes
+
+# 6. Allow passwordless sudo (MUST BE DONE AS ROOT)
+RUN echo "ALL ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 WORKDIR /opt/hermes
 USER ${UID}
