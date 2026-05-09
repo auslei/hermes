@@ -8,16 +8,17 @@ services:
         - GID=${GID}
     container_name: hermes
     restart: unless-stopped
-    command: sh -c "sudo chmod 666 /var/run/docker.sock && uv sync && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
+    command: sh -c "uv sync --all-extras && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
+    
     ports:
       - "8642:8642"
       - "9119:9119"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./opt_data:/opt/data
-      - ./opt_hermes/.hermes:/opt/hermes/.hermes
-      - ./output:/output
+      - ${PWD}/opt_data:/opt/data
+      - ${PWD}/opt_hermes/.hermes:/opt/hermes/.hermes
+      - ${PWD}/output:/output
       # Mount the socket so the container can talk to the host's Docker engine
       - /var/run/docker.sock:/var/run/docker.sock      
       
@@ -31,4 +32,5 @@ services:
       - npm_config_cache=/tmp/.npm      
       - UV_CACHE_DIR=/opt/data/.uv-cache
       - HOME=/opt/hermes
+      - HERMES_SANDBOX_TYPE=local 
       - XDG_CACHE_HOME=/tmp/.cache
