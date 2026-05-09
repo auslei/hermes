@@ -1,25 +1,30 @@
 services:
   hermes:
-    build: .
-    #image: nousresearch/hermes-agent:latest
+    build:
+      context: .
+      args:
+        # Passes the variables from the host/env to the Docker build process
+        - UID=${UID}
+        - GID=${GID}
     container_name: hermes
     restart: unless-stopped
     command: sh -c "uv sync && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
     ports:
-      - "8642:8642" # Gateway API
-      - "9119:9119" # <--- Change this to match the log
+      - "8642:8642"
+      - "9119:9119"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./opt_data:/opt/data
       - ./opt_hermes/.hermes:/opt/hermes/.hermes
       - ./output:/output
+      # Mount the socket so the container can talk to the host's Docker engine
       - /var/run/docker.sock:/var/run/docker.sock      
-      - /usr/bin/docker:/usr/bin/docker
       
     environment:
-      - HERMES_UID=${UID:-1000}
-      - HERMES_GID=${GID:-1000}      
+      # Passes the variables to the running container
+      - HERMES_UID=${UID}
+      - HERMES_GID=${GID}      
       - GATEWAY_ALLOW_ALL_USERS=true
       - HERMES_OUTPUT_PATH=${PWD}/output
       - HERMES_DASHBOARD=1          
@@ -27,7 +32,3 @@ services:
       - UV_CACHE_DIR=/opt/data/.uv-cache
       - HOME=/opt/hermes
       - XDG_CACHE_HOME=/tmp/.cache
-      # 1. Manually set the context length to match Qwen3:14b
-      - HERMES_MODEL_CONTEXT_LENGTH=40960
-      # 2. Tell the agent to ignore the 64k requirement
-      - HERMES_MODEL_MIN_CONTEXT_LENGTH=32768

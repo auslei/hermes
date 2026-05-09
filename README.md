@@ -32,8 +32,14 @@ Interactive Hermes usage also happens through `uv run hermes` inside the running
 
 ## Environment
 
-- `HERMES_UID=${UID:-1000}`: file ownership UID inside the container.
-- `HERMES_GID=${GID:-1000}`: file ownership GID inside the container.
+Firstly run below to setup UID and GID in .env file:
+```
+echo "UID=$(id -u)" >> .env
+echo "GID=$(id -g)" >> .env
+```
+
+- `HERMES_UID=${UID}`: file ownership UID inside the container.
+- `HERMES_GID=${GID}`: file ownership GID inside the container.
 - `GATEWAY_ALLOW_ALL_USERS=true`: allows gateway access for all users in the container.
 - `HERMES_OUTPUT_PATH=${PWD}/output`: host output target path.
 - `HERMES_DASHBOARD=1`: enables the dashboard UI.
