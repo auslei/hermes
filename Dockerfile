@@ -4,6 +4,11 @@ USER root
 
 RUN groupadd -g 999 docker_host && usermod -aG docker_host hermes
 
+# Ensure UID/GID 1000 is resolvable inside the container. Without this,
+# shells can show "I have no name!" when running as numeric UID 1000.
+RUN if ! getent group 1000 >/dev/null; then groupadd -g 1000 hermes_host; fi && \
+    if ! getent passwd 1000 >/dev/null; then useradd -m -u 1000 -g 1000 -s /bin/bash hermes_host; fi
+
 # 1. Install Node 22 and Chrome dependencies
 RUN apt-get update && apt-get install -y curl && \
     curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \

@@ -11,8 +11,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./data:/opt/data
-      - ./data/hermes:/opt/hermes/.hermes
+      - ./opt_data:/opt/data
+      - ./opt_hermes/.hermes:/opt/hermes/.hermes
       - ./output:/output
       - /var/run/docker.sock:/var/run/docker.sock      
       - /usr/bin/docker:/usr/bin/docker

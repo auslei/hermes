@@ -51,8 +51,8 @@ Interactive Hermes usage also happens through `uv run hermes` inside the running
 Create the local data directory first:
 
 ```bash
-mkdir -p ./data
-mkdir -p ./data/hermes
+mkdir -p ./opt_data
+mkdir -p ./opt_hermes
 mkdir -p ./output
 ```
 
@@ -127,6 +127,7 @@ Hermes configuration and working state are stored in `./data` on the host and mo
 Generated outputs are written to `./output` on the host through the `/output` mount.
 
 ## Troubleshooting
+
 - Always use uv run before hermes in terminal
 - Ensuter terminal is enabled: `uv run hermes skills enable terminal`
 - Run `sudo chmod 666 /var/run/docker.sock` if you see docker errors
