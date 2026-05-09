@@ -9,7 +9,7 @@ services:
     container_name: hermes
     restart: unless-stopped
     command: sh -c "uv sync --all-extras && HERMES_ALLOW_ROOT_GATEWAY=1 uv run hermes gateway run"
-    
+
     ports:
       - "8642:8642"
       - "9119:9119"
@@ -21,7 +21,10 @@ services:
       - ${PWD}/output:/output
       # Mount the socket so the container can talk to the host's Docker engine
       - /var/run/docker.sock:/var/run/docker.sock      
-      
+
+      # Mount the agent source code for live editing and development (for hermes-webui to access as well)
+      - hermes-agent-src:/opt/hermes
+
     environment:
       # Passes the variables to the running container
       - HERMES_UID=${UID}
@@ -33,4 +36,29 @@ services:
       - UV_CACHE_DIR=/opt/data/.uv-cache
       - HOME=/opt/hermes
       - HERMES_SANDBOX_TYPE=local 
-      - XDG_CACHE_HOME=/tmp/.cache
+      - XDG_CACHE_HOME=/tmp/.cache      
+
+  hermes-webui:
+    image: ghcr.io/nesquena/hermes-webui:latest
+    container_name: hermes-webui
+    depends_on:
+      - hermes
+    ports:
+      - "8787:8787"
+    volumes:
+      - ${PWD}/opt_data:/home/hermeswebui/.hermes
+      - ${PWD}/output:/workspace      
+      - hermes-agent-src:/home/hermeswebui/.hermes/hermes-agent
+    environment:
+      - HERMES_WEBUI_HOST=0.0.0.0
+      - HERMES_WEBUI_PORT=8787
+      - HERMES_WEBUI_STATE_DIR=/home/hermeswebui/.hermes/webui
+      - HERMES_WEBUI_AGENT_DIR=/agent-src
+      - WANTED_UID=${UID}
+      - WANTED_GID=${GID}
+      - UV_CACHE_DIR=/home/hermeswebui/.hermes/.uv-cache
+      - UV_LINK_MODE=copy
+      - HERMES_WEBUI_AGENT_DIR=/home/hermeswebui/.hermes/hermes-agent
+
+volumes:
+  hermes-agent-src:
