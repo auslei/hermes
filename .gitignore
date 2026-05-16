@@ -1,3 +1,4 @@
 opt_*
 output
 .DS_Store
+.env

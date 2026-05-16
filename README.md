@@ -124,3 +124,31 @@ docker compose logs -f hermes-webui
 - **`docker compose restart`**: Quick restart of processes.
 - **`docker compose down && docker compose up -d`**: Recreates containers (apply `docker-compose.yml` changes).
 - **`docker compose up -d --build`**: Rebuilds the agent image (apply `Dockerfile` changes).
+
+### 7. Hermes WebUI: AIAgent Import Error
+**Issue:** In a separate WebUI container, the WebUI fails to import `AIAgent` with: `Error: AIAgent not available -- check that hermes-agent is on sys.path`.
+
+**Cause:** The WebUI container has the `hermes-agent` source code on `sys.path` (as raw directory entries) but the package was never installed via `pip install -e .` into the WebUI's Python venv.
+
+**Fix (Manual):**
+Exec into the WebUI container and run:
+```bash
+# Find the hermes-agent source
+ls /home/hermeswebui/.hermes/hermes-agent/pyproject.toml
+
+# Install in editable mode into the WebUI's venv
+/app/venv/bin/pip install -e /home/hermeswebui/.hermes/hermes-agent
+
+# Verify
+/app/venv/bin/python -c "from agent import AIAgent; print('OK')"
+```
+
+**Making It Permanent:**
+To survive container rebuilds, either:
+1. **WebUI Dockerfile:** Copy the `hermes-agent` source and pip install:
+   ```dockerfile
+   COPY --from=ghcr.io/nousresearch/hermes-agent:latest /opt/hermes /opt/hermes-agent-source
+   RUN /app/venv/bin/pip install -e /opt/hermes-agent-source
+   ```
+2. **Volume Mount:** Volume mount the source and install at startup via a custom entrypoint script.
+3. **Runtime Config:** Set `HERMES_WEBUI_AGENT_DIR` to a host-mounted path containing a full `hermes-agent` checkout, then run `pip install -e $HERMES_WEBUI_AGENT_DIR` in the WebUI's startup.
